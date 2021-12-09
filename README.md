@@ -8,10 +8,10 @@ The user of the system should see a one-page Web App that displays a map of a ce
 - Create a bounding box over the area s/he is interested in.
 - A diagram to show the distribution of tweets over time is displayed.
 - Then the user selects a single timestamp to explore the content of tweets in this area during this time period.  
- -- the top trendy tweets in this area are listed and scored
- -- word cloud
+  - the top trendy tweets in this area are listed and scored
+  - word cloud
 [be creative and show how you can build a story of insights that can add value]
  
 Notes:
-·   	Users should use ElasticSearch to index the tweets.
-·   	You can use leaflet to build the UI of the Web App.
+- Users should use ElasticSearch to index the tweets.
+- You can use leaflet to build the UI of the Web App.
