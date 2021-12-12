@@ -7,14 +7,28 @@
       <h2>Cordinates</h2>
       <form action="/api/v1/insert_data" method="POST">        
          <label for="lat_min">latitude min:</label><br>
-         <input type="number" step="0.001" name="lat_min" required><br>
+         <input type="number" step="0.001" name="lat_min" min="-90" max="90" required><br>
          <label for="lon_min">longitude min:</label><br>
-         <input type="number" step="0.001" name="lon_min" required><br>
+         <input type="number" step="0.001" name="lon_min" min="-180" max="180" required><br>
          <label for="lat_max">latitude max:</label><br>
-         <input type="number" step="0.001" name="lat_max" required><br>
+         <input type="number" step="0.001" name="lat_max" min="-90" max="90" required><br>
          <label for="lon_max">longitude max:</label><br>
-         <input type="number" step="0.001" name="lon_max" required><br>
-         <input type="submit" value="Submit">
+         <input type="number" step="0.001" name="lon_max" min="-180" max="180" required><br>
+         <input type="submit" value="Submit" onclick="compare()">
       </form>
+      <script>
+         function compare(){
+            let lat_min = document.getElementsByName("lat_min")
+            let lat_max = document.getElementsByName("lat_max")
+            let lon_min = document.getElementsByName("lon_min")
+            let lon_max = document.getElementsByName("lon_max")
+            if((lat_max < lat_min)||(lat_max == lat_min)){
+               alert("latitude max Must be lager more latitude min");
+            }
+            if((lon_max < lon_min)||(lon_max == lon_min)){
+               alert("longitude max Must be lager more longitude min");
+            }
+         }
+      </script>
    </body>
 </html>
