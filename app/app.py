@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for
+from flask import Flask, jsonify, render_template, request, url_for
 from werkzeug.utils import redirect
 from elasticsearch import Elasticsearch
 
@@ -22,15 +22,38 @@ def home():
 @app.route('/api/v1/search/<bounding_box>')
 def search_query(bounding_box):
     """ Function to Search query
-    that recieve the coordinate data from insert_data function,
+    that receives the coordinate data from insert_data function,
     then search in tweets index.
-
-    its in test mode.
-
+    :param bounding_box: tuple contain coordinate, they were represented as follows:
+        [0] longitude min
+        [1] longitude max
+        [2] latitude min
+        [3] latitude max
     Return:
         [str]: [to validate that the function is running correctly.]
     """
-    return str('test response')
+    # set the body of query using geo bounding box filtering
+    body = {
+        "query": {
+            "bool": {
+                "must": {
+                    "match_all": {}
+                },
+                "filter": {
+                    "geo_bounding_box": {
+                        "location": {
+                            "top_right": [bounding_box[2], bounding_box[0]],
+                            "bottom_left": [bounding_box[3], bounding_box[1]]
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # receive response from search query in tweets index
+    result = es.search(index="tweets", body=body)
+    return jsonify(result)
 
 
 @app.route('/api/v1/insert_data', methods=['POST'])
