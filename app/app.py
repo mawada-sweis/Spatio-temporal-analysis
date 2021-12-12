@@ -41,9 +41,9 @@ def search_query(bounding_box):
                 },
                 "filter": {
                     "geo_bounding_box": {
-                        "location": {
-                            "top_right": [bounding_box[2], bounding_box[0]],
-                            "bottom_left": [bounding_box[3], bounding_box[1]]
+                        "coordinates": {
+                            "top_left": [bounding_box[0], bounding_box[3]],
+                            "bottom_right": [bounding_box[1], bounding_box[2]]
                         }
                     }
                 }
