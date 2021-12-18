@@ -19,19 +19,20 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/api/v1/search/<bounding_box>')
+@app.route('/api/v1/search/<bounding_box>', methods=['POST'])
 def search_query(bounding_box):
     """ Function to Search query
     that receives the coordinate data from insert_data function,
     then search in tweets index.
-    :param bounding_box: tuple contain coordinate, they were represented as follows:
+    :param bounding_box: tuple contain coordinate,
+    they were represented as follows:
         [1][1] longitude min
         [0][1] longitude max
         [1][0] latitude min
         [0][0] latitude max
         [[lat_max, lon_max], [lat_min, lon_min]]
     Return:
-        [str]: [to validate that the function is running correctly.]
+        [Response]: [to validate that the function is running correctly.]
     """
     # set the body of query using geo bounding box filtering
     body = {
@@ -42,9 +43,11 @@ def search_query(bounding_box):
                 },
                 "filter": {
                     "geo_bounding_box": {
-                        "coordinates": {
-                            "top_left": [bounding_box[0][0], bounding_box[0][1]],
-                            "bottom_right": [bounding_box[1][0], bounding_box[1][1]]
+                        "location": {
+                            "top_left": [bounding_box[0][0],
+                                         bounding_box[0][1]],
+                            "bottom_right": [bounding_box[1][0],
+                                             bounding_box[1][1]]
                         }
                     }
                 }
@@ -54,6 +57,8 @@ def search_query(bounding_box):
 
     # receive response from search query in tweets index
     result = es.search(index="tweets", body=body)
+    # the body of result is in result['hits']['hits']
+    # you should changes returns to display the plot
     return jsonify(result)
 
 
@@ -71,9 +76,9 @@ def insert_data():
     lat_min, lat_max = request.form['lat_min'], request.form['lat_max']
     lon_min, lon_max = request.form['lon_min'], request.form['lon_max']
 
-    if lat_max < lat_min or lat_max == lat_min :
+    if lat_max < lat_min or lat_max == lat_min:
         return("latitude max Must be lager more latitude min")
-    if lon_max < lon_min or lon_max == lon_min :
+    if lon_max < lon_min or lon_max == lon_min:
         return("longitude max Must be lager more longitude min")
 
     # Create Bounding box tuple
