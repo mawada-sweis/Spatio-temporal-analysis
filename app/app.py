@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, render_template, request, url_for
 from werkzeug.utils import redirect
 from elasticsearch import Elasticsearch
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # create elastic search object
 es = Elasticsearch()
@@ -57,9 +59,21 @@ def search_query(bounding_box):
 
     # receive response from search query in tweets index
     result = es.search(index="tweets", body=body)
-    # the body of result is in result['hits']['hits']
-    # you should changes returns to display the plot
-    return jsonify(result)
+
+    # Plot date frequency
+    date_tweets = [hit["_source"]['created_at'].split("T")[0] for hit in result['hits']['hits']]
+
+    ax = date_tweets.hist(xrot=45,  
+                        bins = (date_tweets.max() -
+                                date_tweets.min()).days)
+    
+    ax.set_ylabel('Tweet count')
+
+    plt.show()
+    plt.savefig('./new_plot.png')
+    return render_template('index.html', name = 'new_plot', url ='./new_plot.png')
+
+    # return jsonify(result)
 
 
 @app.route('/api/v1/insert_data', methods=['POST'])
