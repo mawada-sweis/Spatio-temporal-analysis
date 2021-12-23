@@ -2,62 +2,16 @@
 <html>
    <head>
       <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-      <link rel="stylesheet" href="../static/style.css">
       <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-      <script src="../static/app.js"></script>
-      <title>Tweets</title>
+      <title>Spatio-temporal analysis of a twitter Stream</title>
    </head>
    <body>
-      <h1 class='title'>Spatio-temporal analysis of a twitter Stream
-      </h1>
-      <div class="row">
-         <div class="column col-3">
-            <div>
-               <h2>Cordinates</h2>
-               <form action="/api/v1/insert_data" method="POST" class="form">
-                  <div class="row">
-                     <div class="col"></div>
-                     <div class="col">
-                        <label for="lat_min" class="cor">latitude min</label><br>
-                        <input type="number" step="0.001" name="lat_min" id="lat_min" min="-90" max="90" required><br>   
-                     </div>
-                     <div class="col"></div>
-                     <div class="w-100"></div>
-                     <div class="col">
-                        <label for="lon_min" class="cor">longitude min</label><br>
-                        <input type="number" step="0.001" name="lon_min" id="lon_min" min="-180" max="180" required><br>
-                     </div>
-                     <div class="col"></div>
-                     <div class="col">
-                        <label for="lon_max" class="cor">longitude max</label><br>
-                        <input type="number" step="0.001" name="lon_max" id="lon_max" min="-180" max="180" required><br>
-                     </div>
-                     <div class="w-100"></div>
-                     <div class="col"></div>
-                     <div class="col">
-                        <label for="lat_max" class="cor">latitude max</label><br>
-                        <input type="number" step="0.001" name="lat_max" id="lat_max" min="-90" max="90" required><br>
-                     </div>
-                     <div class="col"></div>
-                  </div>
-               </form>
-               <div style="padding-top: 15%;"></div>
-               <div >
-                  <input type="submit" value="Search" onclick="draw_rectangle()" class="align-items-center search form-control">   
-               </div>
-            </div>
-         </div>
-         
-         <div class="column col-6">
-            <p>{{ name }}</p>
-
-            <img src={{ url }} alt="Chart" height="42" width="42">
-         </div>    
-
-         <div class="column" id="map">map</div>
-      </div>
-   <script>
+      <div id="map" style = "width: 100%; height: 580px"></div>
+      <div>
+         <p>{{ name }}</p>
+         <img src={{ url }} alt="Chart" height="42" width="42"> 
+      </div>    
+      <script>
       // The first parameter are the coordinates of the center of the map
       // The second parameter is the zoom level
       var map = L.map('map').setView([31.9522, 35.2332], 10);
@@ -75,6 +29,42 @@
          
       // Now add the layer onto the map
       map.addLayer(layer);
-   </script>
+
+      // Rectangle Section and Insert Data
+      var oneCorner;
+      var TwoCroner; 
+
+      // Call the functions
+      map.on('mousedown', setOneCorner);
+      map.on('mouseup', setTwoCorner);
+         
+      function setOneCorner(e)
+      {
+         if (e.originalEvent.ctrlKey) {
+            map.dragging.disable();
+            oneCorner = e.latlng;   
+            } 
+      }
+      
+      function setTwoCorner(e)
+      {
+         if (e.originalEvent.ctrlKey) {
+            twoCorner = e.latlng;    
+            var bounds = [oneCorner, twoCorner];
+            L.rectangle(bounds, {color:"#9b2226", weight:1}).addTo(map);        
+         }
+         map.dragging.enable();
+             
+         // zoom the map to the rectangle bounds
+         map.fitBounds(bounds); 
+             
+         // sending data to flask endpoint
+         const URL = '/api/v1/insert_data'
+         const xhr = new XMLHttpRequest();
+         sender = JSON.stringify(bounds)
+         xhr.open('POST', URL);
+         xhr.send(sender);
+      }
+      </script>
    </body>
 </html>
